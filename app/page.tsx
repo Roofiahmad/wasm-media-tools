@@ -18,12 +18,11 @@ export default function Home() {
     convertVideo,
   } = useFFmpeg();
 
-  // Mode Tab: "audio", "compress", atau "convert"
   const [activeTab, setActiveTab] = useState<"audio" | "compress" | "convert">(
     "audio",
   );
 
-  // State Audio Options
+  // State Audio Options (Lengkap dengan Trimming / Clipping)
   const [format, setFormat] = useState<string>("mp3");
   const [startTime, setStartTime] = useState<string>("");
   const [duration, setDuration] = useState<string>("");
@@ -35,7 +34,6 @@ export default function Home() {
 
   // State Video Converter Options
   const [videoFormat, setVideoFormat] = useState<string>("mp4");
-
   const [selectedFileName, setSelectedFileName] =
     useState<string>("media-output");
 
@@ -64,20 +62,20 @@ export default function Home() {
   };
 
   return (
-    <main className="flex-1 w-full bg-gray-50 flex items-center justify-center p-6">
-      <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-        {/* HEADER */}
+    <main className="flex-1 w-full bg-gray-50 py-12 px-4 flex flex-col items-center justify-start">
+      {/* CARD TOOL UTAMA */}
+      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100 mb-10">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
             WASM Media Tool
           </h1>
           <p className="text-gray-500 mt-2 text-sm">
             Extract audio, compress video, and convert formats 100% locally in
-            browser.
+            your browser.
           </p>
         </div>
 
-        {/* TAB SWITCHER (3 MODES) */}
+        {/* TAB SWITCHER */}
         <div className="flex bg-gray-100 p-1 rounded-xl mb-6 text-xs font-medium">
           <button
             onClick={() => setActiveTab("audio")}
@@ -127,12 +125,13 @@ export default function Home() {
           </div>
         )}
 
-        {/* --- SETTINGS PANEL BERDASARKAN TAB --- */}
+        {/* SETTINGS PANELS */}
         {activeTab === "audio" && (
           <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 space-y-4">
             <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500">
-              Audio Settings
+              Audio Settings & Trimming
             </h2>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -142,14 +141,26 @@ export default function Home() {
                   value={format}
                   onChange={(e) => setFormat(e.target.value)}
                   disabled={isProcessing}
-                  className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none"
+                  className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="mp3">.MP3</option>
-                  <option value="m4a">.M4A</option>
-                  <option value="aac">.AAC</option>
-                  <option value="wav">.WAV</option>
-                  <option value="flac">.FLAC</option>
-                  <option value="opus">.OPUS</option>
+                  <option value="mp3" className="text-gray-900 bg-white">
+                    .MP3
+                  </option>
+                  <option value="m4a" className="text-gray-900 bg-white">
+                    .M4A
+                  </option>
+                  <option value="aac" className="text-gray-900 bg-white">
+                    .AAC
+                  </option>
+                  <option value="wav" className="text-gray-900 bg-white">
+                    .WAV
+                  </option>
+                  <option value="flac" className="text-gray-900 bg-white">
+                    .FLAC
+                  </option>
+                  <option value="opus" className="text-gray-900 bg-white">
+                    .OPUS
+                  </option>
                 </select>
               </div>
               <div>
@@ -160,39 +171,47 @@ export default function Home() {
                   value={bitrate}
                   onChange={(e) => setBitrate(e.target.value)}
                   disabled={isProcessing || ["wav", "flac"].includes(format)}
-                  className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none disabled:opacity-50"
+                  className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                 >
-                  <option value="128k">128 kbps</option>
-                  <option value="192k">192 kbps</option>
-                  <option value="320k">320 kbps</option>
+                  <option value="128k" className="text-gray-900 bg-white">
+                    128 kbps
+                  </option>
+                  <option value="192k" className="text-gray-900 bg-white">
+                    192 kbps
+                  </option>
+                  <option value="320k" className="text-gray-900 bg-white">
+                    320 kbps
+                  </option>
                 </select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-200">
+
+            {/* Bagian Clip / Trimming yang sempat hilang */}
+            <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-200">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Start (s)
+                  Start Time (Detik)
                 </label>
                 <input
                   type="number"
-                  placeholder="0"
+                  placeholder="Contoh: 0"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
                   disabled={isProcessing}
-                  className="w-full bg-white border border-gray-300 text-sm text-gray-700 rounded-lg p-2 outline-none"
+                  className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Duration (s)
+                  Duration / Durasi (Detik)
                 </label>
                 <input
                   type="number"
-                  placeholder="Full"
+                  placeholder="Kosongkan jika full"
                   value={duration}
                   onChange={(e) => setDuration(e.target.value)}
                   disabled={isProcessing}
-                  className="w-full bg-white border border-gray-300 text-sm text-gray-700 rounded-lg p-2 outline-none"
+                  className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -213,12 +232,20 @@ export default function Home() {
                   value={resolution}
                   onChange={(e) => setResolution(e.target.value)}
                   disabled={isProcessing}
-                  className="w-full bg-white border border-gray-300 text-sm text-gray-700 rounded-lg p-2 outline-none"
+                  className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none"
                 >
-                  <option value="original">Original</option>
-                  <option value="1080">1080p</option>
-                  <option value="720">720p</option>
-                  <option value="480">480p</option>
+                  <option value="original" className="text-gray-900 bg-white">
+                    Original
+                  </option>
+                  <option value="1080" className="text-gray-900 bg-white">
+                    1080p
+                  </option>
+                  <option value="720" className="text-gray-900 bg-white">
+                    720p
+                  </option>
+                  <option value="480" className="text-gray-900 bg-white">
+                    480p
+                  </option>
                 </select>
               </div>
               <div>
@@ -229,11 +256,17 @@ export default function Home() {
                   value={videoBitrate}
                   onChange={(e) => setVideoBitrate(e.target.value)}
                   disabled={isProcessing}
-                  className="w-full bg-white border border-gray-300 text-sm text-gray-700 rounded-lg p-2 outline-none"
+                  className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none"
                 >
-                  <option value="800k">800 kbps (High)</option>
-                  <option value="1500k">1500 kbps (Balanced)</option>
-                  <option value="3000k">3000 kbps (HQ)</option>
+                  <option value="800k" className="text-gray-900 bg-white">
+                    800 kbps (High)
+                  </option>
+                  <option value="1500k" className="text-gray-900 bg-white">
+                    1500 kbps (Balanced)
+                  </option>
+                  <option value="3000k" className="text-gray-900 bg-white">
+                    3000 kbps (HQ)
+                  </option>
                 </select>
               </div>
             </div>
@@ -255,26 +288,31 @@ export default function Home() {
                 disabled={isProcessing}
                 className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none"
               >
-                <option value="mp4">.MP4 (MPEG-4 / H.264)</option>
-                <option value="webm">.WEBM (VP9 / Web Optimized)</option>
-                <option value="mkv">.MKV (Matroska)</option>
-                <option value="avi">.AVI (Audio Video Interleave)</option>
-                <option value="mov">.MOV (QuickTime Apple)</option>
+                <option value="mp4" className="text-gray-900 bg-white">
+                  .MP4
+                </option>
+                <option value="webm" className="text-gray-900 bg-white">
+                  .WEBM
+                </option>
+                <option value="mkv" className="text-gray-900 bg-white">
+                  .MKV
+                </option>
+                <option value="avi" className="text-gray-900 bg-white">
+                  .AVI
+                </option>
               </select>
             </div>
           </div>
         )}
 
-        {/* DRAG & DROP AREA */}
+        {/* DROPZONE & PROGRESS */}
         <Dropzone
           onFileSelect={handleFileSelect}
           disabled={!isReady || isProcessing}
         />
-
-        {/* PROGRESS BAR */}
         {isProcessing && <ProgressBar progress={progress} />}
 
-        {/* RESULT SECTION */}
+        {/* RESULT */}
         {resultUrl && !isProcessing && (
           <div className="mt-6 space-y-4 animate-in fade-in zoom-in duration-300">
             {activeTab === "audio" ? (
@@ -285,7 +323,7 @@ export default function Home() {
             ) : (
               <div className="p-4 bg-slate-900 text-white rounded-2xl flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-slate-400">Conversion Success</p>
+                  <p className="text-xs text-slate-400">Success</p>
                   <p className="text-sm font-medium">
                     {selectedFileName}.
                     {activeTab === "compress" ? "mp4" : videoFormat}
@@ -299,36 +337,60 @@ export default function Home() {
               </div>
             )}
 
-            {/* DOWNLOAD BUTTON */}
             <a
               href={resultUrl}
               download={
                 activeTab === "audio"
                   ? `${selectedFileName}.${format}`
-                  : activeTab === "compress"
-                    ? `${selectedFileName}_compressed.mp4`
-                    : `${selectedFileName}_converted.${videoFormat}`
+                  : `${selectedFileName}_output.${activeTab === "compress" ? "mp4" : videoFormat}`
               }
               className="w-full flex items-center justify-center space-x-2 px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-xl font-medium transition-colors shadow-sm cursor-pointer"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
               <span>Download File Result</span>
             </a>
           </div>
         )}
       </div>
+
+      {/* --- SEO SECTION MEMANJANG (GRID 2 KOLOM) --- */}
+      <section className="max-w-2xl w-full bg-white rounded-2xl shadow-sm p-8 border border-gray-100 text-gray-700 space-y-6">
+        <div className="border-b border-gray-100 pb-4">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            Why Use WASM Media Tool?
+          </h2>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            Most online converters require you to upload your personal videos or
+            audio files to a third-party cloud server. WASM Media Tool operates
+            entirely on your device using WebAssembly technology. Your files
+            never leave your browser, ensuring absolute privacy and zero upload
+            waiting times.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <h3 className="font-semibold text-gray-900 text-sm mb-1">
+              🔒 Is my data safe?
+            </h3>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              Yes, 100% safe. All processing happens locally inside your browser
+              memory sandbox. We do not store, track, or look at your media
+              files.
+            </p>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <h3 className="font-semibold text-gray-900 text-sm mb-1">
+              ⚡ How does it work?
+            </h3>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              We run a compiled version of FFmpeg directly inside a web worker
+              using WebAssembly and multi-threading, bringing native
+              desktop-grade media conversion straight to your browser.
+            </p>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
