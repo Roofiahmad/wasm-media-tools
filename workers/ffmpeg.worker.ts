@@ -9,7 +9,6 @@ self.onmessage = async (e: MessageEvent) => {
   if (type === "INIT") {
     try {
       const baseURL = "https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/umd";
-
       const coreURL = await toBlobURL(
         `${baseURL}/ffmpeg-core.js`,
         "text/javascript",
@@ -27,16 +26,7 @@ self.onmessage = async (e: MessageEvent) => {
         self.postMessage({ type: "PROGRESS", payload: progress });
       });
 
-      ffmpeg.on("log", ({ message }) => {
-        self.postMessage({ type: "LOG", payload: message });
-      });
-
-      await ffmpeg.load({
-        coreURL,
-        wasmURL,
-        workerURL,
-      });
-
+      await ffmpeg.load({ coreURL, wasmURL, workerURL });
       self.postMessage({ type: "INIT_DONE" });
     } catch (error) {
       self.postMessage({
@@ -51,18 +41,42 @@ self.onmessage = async (e: MessageEvent) => {
 
   if (type === "CONVERT") {
     try {
-      const { file, outputFormat } = payload;
+      const { file, outputFormat, startTime, duration, bitrate } = payload;
       const inputName = file.name;
       const outputName = `output.${outputFormat}`;
 
       await ffmpeg.writeFile(inputName, await fetchFile(file));
 
-      // Eksekusi konversi
-      await ffmpeg.exec(["-i", inputName, outputName]);
+      // Susun argumen command line FFmpeg secara dinamis
+      const args: string[] = [];
+
+      // 1. Trimming (jika ada start time)
+      if (startTime && startTime > 0) {
+        args.push("-ss", String(startTime));
+      }
+      if (duration && duration > 0) {
+        args.push("-t", String(duration));
+      }
+
+      // 2. Input file
+      args.push("-i", inputName);
+
+      // 3. Bitrate / Quality (hanya berlaku untuk format kompresi lossy tertentu)
+      if (
+        bitrate &&
+        ["mp3", "aac", "ogg", "opus", "wma"].includes(outputFormat)
+      ) {
+        args.push("-b:a", bitrate);
+      }
+
+      // 4. Output filename
+      args.push(outputName);
+
+      // Eksekusi perintah FFmpeg
+      await ffmpeg.exec(args);
 
       const data = await ffmpeg.readFile(outputName);
 
-      // Mapping MIME Type agar file dikenali sempurna oleh OS/Browser
       const mimeTypes: Record<string, string> = {
         mp3: "audio/mpeg",
         m4a: "audio/mp4",
@@ -83,7 +97,6 @@ self.onmessage = async (e: MessageEvent) => {
         mimeTypes[outputFormat as string] || `audio/${outputFormat}`;
       const blob = new Blob([data as unknown as BlobPart], { type: mimeType });
 
-      // Clean up VFS memory
       await ffmpeg.deleteFile(inputName);
       await ffmpeg.deleteFile(outputName);
 

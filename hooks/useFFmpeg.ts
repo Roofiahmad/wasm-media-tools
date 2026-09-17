@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
+interface ConvertOptions {
+  format?: string;
+  startTime?: number;
+  duration?: number;
+  bitrate?: string;
+}
+
 export function useFFmpeg() {
   const workerRef = useRef<Worker | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -19,7 +26,6 @@ export function useFFmpeg() {
 
       workerRef.current.onmessage = (e: MessageEvent) => {
         const { type, payload } = e.data;
-
         switch (type) {
           case "INIT_DONE":
             setIsReady(true);
@@ -51,11 +57,9 @@ export function useFFmpeg() {
     };
   }, []);
 
-  // Update tipe format menjadi string agar dinamis
   const extractAudio = useCallback(
-    (file: File, format: string = "mp3") => {
+    (file: File, options: ConvertOptions = {}) => {
       if (!workerRef.current || !isReady) return;
-
       setIsProcessing(true);
       setProgress(0);
       setResultUrl(null);
@@ -63,7 +67,13 @@ export function useFFmpeg() {
 
       workerRef.current.postMessage({
         type: "CONVERT",
-        payload: { file, outputFormat: format },
+        payload: {
+          file,
+          outputFormat: options.format || "mp3",
+          startTime: options.startTime || 0,
+          duration: options.duration || 0,
+          bitrate: options.bitrate || "192k",
+        },
       });
     },
     [isReady],
