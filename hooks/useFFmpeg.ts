@@ -2,11 +2,22 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
-interface ConvertOptions {
+interface AudioOptions {
   format?: string;
   startTime?: number;
   duration?: number;
   bitrate?: string;
+}
+
+interface VideoOptions {
+  resolution?: string; // "1080", "720", "480", "original"
+  videoBitrate?: string; // "1000k", "2000k", dll
+}
+
+interface VideoConvertOptions {
+  format?: string; // "mp4", "mkv", "webm", "avi", "mov"
+  videoCodec?: string;
+  audioCodec?: string;
 }
 
 export function useFFmpeg() {
@@ -33,7 +44,7 @@ export function useFFmpeg() {
           case "PROGRESS":
             setProgress(Math.round(payload * 100));
             break;
-          case "CONVERT_DONE":
+          case "PROCESS_DONE":
             const url = URL.createObjectURL(payload as Blob);
             setResultUrl(url);
             setIsProcessing(false);
@@ -58,7 +69,7 @@ export function useFFmpeg() {
   }, []);
 
   const extractAudio = useCallback(
-    (file: File, options: ConvertOptions = {}) => {
+    (file: File, options: AudioOptions = {}) => {
       if (!workerRef.current || !isReady) return;
       setIsProcessing(true);
       setProgress(0);
@@ -66,7 +77,7 @@ export function useFFmpeg() {
       setError(null);
 
       workerRef.current.postMessage({
-        type: "CONVERT",
+        type: "CONVERT_AUDIO",
         payload: {
           file,
           outputFormat: options.format || "mp3",
@@ -79,5 +90,55 @@ export function useFFmpeg() {
     [isReady],
   );
 
-  return { isReady, isProcessing, progress, resultUrl, error, extractAudio };
+  const compressVideo = useCallback(
+    (file: File, options: VideoOptions = {}) => {
+      if (!workerRef.current || !isReady) return;
+      setIsProcessing(true);
+      setProgress(0);
+      setResultUrl(null);
+      setError(null);
+
+      workerRef.current.postMessage({
+        type: "COMPRESS_VIDEO",
+        payload: {
+          file,
+          resolution: options.resolution || "original",
+          videoBitrate: options.videoBitrate || "1500k",
+        },
+      });
+    },
+    [isReady],
+  );
+
+  const convertVideo = useCallback(
+    (file: File, options: VideoConvertOptions = {}) => {
+      if (!workerRef.current || !isReady) return;
+      setIsProcessing(true);
+      setProgress(0);
+      setResultUrl(null);
+      setError(null);
+
+      workerRef.current.postMessage({
+        type: "CONVERT_VIDEO",
+        payload: {
+          file,
+          outputFormat: options.format || "mp4",
+          videoCodec: options.videoCodec || "libx264",
+          audioCodec: options.audioCodec || "aac",
+        },
+      });
+    },
+    [isReady],
+  );
+
+  return {
+    isReady,
+    isProcessing,
+    progress,
+    resultUrl,
+    error,
+    extractAudio,
+    compressVideo,
+    convertVideo,
+  };
 }
