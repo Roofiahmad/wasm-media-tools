@@ -3,8 +3,8 @@ interface VideoSettingsProps {
   setResolution: (val: string) => void;
   videoBitrate: string;
   setVideoBitrate: (val: string) => void;
-  outputFormat: string; // <-- Tambahan state format
-  setOutputFormat: (val: string) => void; // <-- Tambahan setter format
+  outputFormat: string;
+  setOutputFormat: (val: string) => void;
   preset: string;
   setPreset: (val: string) => void;
   fps: string;
@@ -30,13 +30,13 @@ export default function VideoSettings({
   isProcessing,
 }: VideoSettingsProps) {
   return (
-    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 space-y-4">
+    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 space-y-4 text-left">
       <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500">
         Advanced Video Compression Settings
       </h2>
 
-      {/* Baris 1: Resolution, Bitrate, & Output Format */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* Baris 1: Kolom otomatis jadi 1 baris di HP, 3 kolom di tablet/desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">
             Resolution
@@ -45,7 +45,7 @@ export default function VideoSettings({
             value={resolution}
             onChange={(e) => setResolution(e.target.value)}
             disabled={isProcessing}
-            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none"
+            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none"
           >
             <option value="original" className="text-gray-900 bg-white">
               Original
@@ -69,7 +69,7 @@ export default function VideoSettings({
             value={videoBitrate}
             onChange={(e) => setVideoBitrate(e.target.value)}
             disabled={isProcessing}
-            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none"
+            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none"
           >
             <option value="800k" className="text-gray-900 bg-white">
               800 kbps
@@ -90,7 +90,7 @@ export default function VideoSettings({
             value={outputFormat}
             onChange={(e) => setOutputFormat(e.target.value)}
             disabled={isProcessing}
-            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none  text-blue-600"
+            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none  text-blue-600"
           >
             <option value="mp4" className="text-gray-900 bg-white">
               .MP4
@@ -111,8 +111,8 @@ export default function VideoSettings({
         </div>
       </div>
 
-      {/* Baris 2: Preset Kecepatan & Frame Rate */}
-      <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-200">
+      {/* Baris 2: Preset & FPS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-200">
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">
             Encoding Speed (Preset)
@@ -121,7 +121,7 @@ export default function VideoSettings({
             value={preset}
             onChange={(e) => setPreset(e.target.value)}
             disabled={isProcessing}
-            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none"
+            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none"
           >
             <option value="ultrafast" className="text-gray-900 bg-white">
               Ultrafast (Tercepat)
@@ -142,7 +142,7 @@ export default function VideoSettings({
             value={fps}
             onChange={(e) => setFps(e.target.value)}
             disabled={isProcessing}
-            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none"
+            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none"
           >
             <option value="original" className="text-gray-900 bg-white">
               Original
@@ -160,19 +160,19 @@ export default function VideoSettings({
         </div>
       </div>
 
-      {/* Baris 3: Audio Stream Copy */}
-      <div className="pt-2 border-t border-gray-200 flex items-center space-x-2">
+      {/* Baris 3: Checkbox */}
+      <div className="pt-2 border-t border-gray-200 flex items-start sm:items-center space-x-2">
         <input
           type="checkbox"
           id="audioCopy"
           checked={audioCopy}
           onChange={(e) => setAudioCopy(e.target.checked)}
           disabled={isProcessing}
-          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+          className="w-4 h-4 mt-0.5 sm:mt-0 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer shrink-0"
         />
         <label
           htmlFor="audioCopy"
-          className="text-xs font-medium text-gray-700 cursor-pointer select-none"
+          className="text-xs font-medium text-gray-700 cursor-pointer select-none leading-relaxed"
         >
           Fast Audio Stream Copy (Jangan re-encode audio)
         </label>

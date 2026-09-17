@@ -32,13 +32,13 @@ export default function Home() {
   const [duration, setDuration] = useState<string>("");
   const [bitrate, setBitrate] = useState<string>("192k");
 
-  // Video Compression Custom Options
+  // Video Compression Options
   const [resolution, setResolution] = useState<string>("720");
   const [videoBitrate, setVideoBitrate] = useState<string>("1500k");
+  const [compressionFormat, setCompressionFormat] = useState<string>("mp4");
   const [preset, setPreset] = useState<string>("ultrafast");
   const [fps, setFps] = useState<string>("30");
   const [audioCopy, setAudioCopy] = useState<boolean>(true);
-  const [compressionFormat, setCompressionFormat] = useState<string>("mp4");
 
   // Video Converter Options
   const [videoFormat, setVideoFormat] = useState<string>("mp4");
@@ -57,12 +57,11 @@ export default function Home() {
         duration: duration ? parseFloat(duration) : 0,
         bitrate,
       });
-    }
-    if (activeTab === "compress") {
+    } else if (activeTab === "compress") {
       compressVideo(file, {
         resolution,
         videoBitrate,
-        outputFormat: compressionFormat, // <-- Oper ke hook
+        outputFormat: compressionFormat,
         preset,
         fps,
         audioCopy,
@@ -75,24 +74,25 @@ export default function Home() {
   };
 
   return (
-    <main className="flex-1 w-full bg-gray-50 py-12 px-4 flex flex-col items-center justify-start">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100 mb-10">
+    <main className="flex-1 w-full bg-gray-50 py-6 sm:py-12 px-3 sm:px-4 flex flex-col items-center justify-start">
+      {/* CARD TOOL UTAMA (Padding & Lebar Responsif) */}
+      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-gray-100 mb-8 sm:mb-10">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
             WASM Media Tool
           </h1>
-          <p className="text-gray-500 mt-2 text-sm">
+          <p className="text-gray-500 mt-2 text-xs sm:text-sm">
             Extract audio, compress video, and convert formats 100% locally in
             your browser.
           </p>
         </div>
 
-        {/* TAB SWITCHER */}
-        <div className="flex bg-gray-100 p-1 rounded-xl mb-6 text-xs font-medium">
+        {/* TAB SWITCHER (Responsif ke bawah di layar kecil jika perlu, atau flex rapi) */}
+        <div className="flex flex-col sm:flex-row bg-gray-100 p-1 rounded-xl mb-6 text-xs font-medium gap-1">
           <button
             onClick={() => setActiveTab("audio")}
             disabled={isProcessing}
-            className={`flex-1 py-2 rounded-lg transition-all ${
+            className={`flex-1 py-2.5 rounded-lg transition-all ${
               activeTab === "audio"
                 ? "bg-white text-blue-600 shadow-sm"
                 : "text-gray-500 hover:text-gray-900"
@@ -103,7 +103,7 @@ export default function Home() {
           <button
             onClick={() => setActiveTab("compress")}
             disabled={isProcessing}
-            className={`flex-1 py-2 rounded-lg transition-all ${
+            className={`flex-1 py-2.5 rounded-lg transition-all ${
               activeTab === "compress"
                 ? "bg-white text-blue-600 shadow-sm"
                 : "text-gray-500 hover:text-gray-900"
@@ -114,7 +114,7 @@ export default function Home() {
           <button
             onClick={() => setActiveTab("convert")}
             disabled={isProcessing}
-            className={`flex-1 py-2 rounded-lg transition-all ${
+            className={`flex-1 py-2.5 rounded-lg transition-all ${
               activeTab === "convert"
                 ? "bg-white text-blue-600 shadow-sm"
                 : "text-gray-500 hover:text-gray-900"
@@ -124,14 +124,15 @@ export default function Home() {
           </button>
         </div>
 
+        {/* LOADING & ERROR */}
         {!isReady && (
-          <div className="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 text-center animate-pulse border border-blue-100">
+          <div className="p-3 sm:p-4 mb-4 text-xs sm:text-sm text-blue-800 rounded-lg bg-blue-50 text-center animate-pulse border border-blue-100">
             Loading FFmpeg WASM Core (Multi-Thread)... Please wait.
           </div>
         )}
 
         {error && (
-          <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200">
+          <div className="p-3 sm:p-4 mb-4 text-xs sm:text-sm text-red-800 rounded-lg bg-red-50 border border-red-200">
             <strong>Error:</strong> {error}
           </div>
         )}
@@ -177,12 +178,14 @@ export default function Home() {
           />
         )}
 
+        {/* DROPZONE & PROGRESS */}
         <Dropzone
           onFileSelect={handleFileSelect}
           disabled={!isReady || isProcessing}
         />
         {isProcessing && <ProgressBar progress={progress} />}
 
+        {/* RESULT */}
         {resultUrl && !isProcessing && (
           <div className="mt-6 space-y-4 animate-in fade-in zoom-in duration-300">
             {activeTab === "audio" ? (
@@ -196,7 +199,7 @@ export default function Home() {
                   <p className="text-xs text-slate-400">Success</p>
                   <p className="text-sm font-medium">
                     {selectedFileName}.
-                    {activeTab === "compress" ? "mp4" : videoFormat}
+                    {activeTab === "compress" ? compressionFormat : videoFormat}
                   </p>
                 </div>
                 <video
@@ -213,10 +216,10 @@ export default function Home() {
                 activeTab === "audio"
                   ? `${selectedFileName}.${format}`
                   : activeTab === "compress"
-                    ? `${selectedFileName}_compressed.${compressionFormat}` // <-- Ekstensi dinamis sesuai pilihan
+                    ? `${selectedFileName}_compressed.${compressionFormat}`
                     : `${selectedFileName}_output.${videoFormat}`
               }
-              className="w-full flex items-center justify-center space-x-2 px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-xl font-medium transition-colors shadow-sm cursor-pointer"
+              className="w-full flex items-center justify-center space-x-2 px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-xl font-medium transition-colors shadow-sm cursor-pointer text-sm"
             >
               <span>Download File Result</span>
             </a>
@@ -224,6 +227,7 @@ export default function Home() {
         )}
       </div>
 
+      {/* SEO SECTION */}
       <SeoContent />
     </main>
   );

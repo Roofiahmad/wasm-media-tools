@@ -22,12 +22,12 @@ export default function AudioSettings({
   isProcessing,
 }: AudioSettingsProps) {
   return (
-    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 space-y-4">
+    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 space-y-4 text-left">
       <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500">
         Audio Settings & Trimming
       </h2>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">
             Format
@@ -36,7 +36,7 @@ export default function AudioSettings({
             value={format}
             onChange={(e) => setFormat(e.target.value)}
             disabled={isProcessing}
-            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none"
           >
             <option value="mp3" className="text-gray-900 bg-white">
               .MP3
@@ -66,7 +66,7 @@ export default function AudioSettings({
             value={bitrate}
             onChange={(e) => setBitrate(e.target.value)}
             disabled={isProcessing || ["wav", "flac"].includes(format)}
-            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none disabled:opacity-50"
           >
             <option value="128k" className="text-gray-900 bg-white">
               128 kbps
@@ -81,7 +81,7 @@ export default function AudioSettings({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-gray-200">
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">
             Start Time (Detik)
@@ -92,7 +92,7 @@ export default function AudioSettings({
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             disabled={isProcessing}
-            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none"
           />
         </div>
         <div>
@@ -105,7 +105,7 @@ export default function AudioSettings({
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
             disabled={isProcessing}
-            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none"
           />
         </div>
       </div>
