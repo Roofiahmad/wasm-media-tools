@@ -10,8 +10,12 @@ interface AudioOptions {
 }
 
 interface VideoOptions {
-  resolution?: string; // "1080", "720", "480", "original"
-  videoBitrate?: string; // "1000k", "2000k", dll
+  resolution?: string;
+  videoBitrate?: string;
+  outputFormat?: string;
+  preset?: string;
+  fps?: string;
+  audioCopy?: boolean;
 }
 
 interface VideoConvertOptions {
@@ -104,6 +108,10 @@ export function useFFmpeg() {
           file,
           resolution: options.resolution || "original",
           videoBitrate: options.videoBitrate || "1500k",
+          outputFormat: options.outputFormat || "mp4", // <-- Kirim ke worker
+          preset: options.preset || "ultrafast",
+          fps: options.fps || "30",
+          audioCopy: options.audioCopy ?? true,
         },
       });
     },
