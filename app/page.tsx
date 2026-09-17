@@ -1,69 +1,111 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import Dropzone from "@/components/Dropzone";
+import ProgressBar from "@/components/ProgressBar";
+import { useFFmpeg } from "@/hooks/useFFmpeg";
 
 export default function Home() {
+  const { isReady, isProcessing, progress, resultUrl, error, extractAudio } =
+    useFFmpeg();
+  const [format, setFormat] = useState<string>("mp3");
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <main className="flex-1 w-full bg-gray-50 flex items-center justify-center p-6">
+      <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
+            WASM Media Tool
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-gray-500 mt-2 text-sm">
+            Extract audio completely in your browser. No files uploaded to any
+            server.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {!isReady && (
+          <div className="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 text-center animate-pulse border border-blue-100">
+            Loading FFmpeg WASM Core (Multi-Thread)... Please wait.
+          </div>
+        )}
+
+        {error && (
+          <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200">
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+
+        <div className="flex items-center justify-center space-x-4 mb-4">
+          <span className="text-sm font-medium text-gray-600">
+            Output Format:
+          </span>
+          <select
+            value={format}
+            onChange={(e) => setFormat(e.target.value)}
+            disabled={isProcessing}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none cursor-pointer"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <optgroup label="Popular">
+              <option value="mp3">.MP3 (Universal)</option>
+              <option value="m4a">.M4A (Apple/MPEG-4)</option>
+              <option value="aac">.AAC (High Quality)</option>
+            </optgroup>
+            <optgroup label="Lossless / Uncompressed">
+              <option value="wav">.WAV (Raw Audio)</option>
+              <option value="flac">.FLAC (Lossless Compressed)</option>
+              <option value="aiff">.AIFF (Apple Lossless)</option>
+            </optgroup>
+            <optgroup label="Web Optimized">
+              <option value="opus">.OPUS (WebRTC / Discord)</option>
+              <option value="ogg">.OGG (Vorbis)</option>
+              <option value="webm">.WEBM (Audio Only)</option>
+            </optgroup>
+            <optgroup label="Theater & Legacy">
+              <option value="ac3">.AC3 (Dolby Digital)</option>
+              <option value="wma">.WMA (Windows Media)</option>
+              <option value="amr">.AMR (Voice Recording)</option>
+              <option value="mka">.MKA (Matroska Audio)</option>
+            </optgroup>
+          </select>
         </div>
-      </main>
-    </div>
+
+        <Dropzone
+          onFileSelect={(file) => extractAudio(file, format)}
+          disabled={!isReady || isProcessing}
+        />
+
+        {isProcessing && <ProgressBar progress={progress} />}
+
+        {resultUrl && !isProcessing && (
+          <div className="mt-6 flex flex-col items-center animate-in fade-in zoom-in duration-300">
+            <div className="p-4 bg-green-50 rounded-full mb-3">
+              <svg
+                className="w-8 h-8 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                ></path>
+              </svg>
+            </div>
+            <p className="text-green-700 font-medium mb-3">
+              Extraction Complete!
+            </p>
+            <a
+              href={resultUrl}
+              download={`extracted-audio.${format}`}
+              className="w-full text-center px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors shadow-sm"
+            >
+              Download Audio ({format.toUpperCase()})
+            </a>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
