@@ -35,7 +35,6 @@ export default function VideoSettings({
         Advanced Video Compression Settings
       </h2>
 
-      {/* Baris 1: Kolom otomatis jadi 1 baris di HP, 3 kolom di tablet/desktop */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -111,7 +110,6 @@ export default function VideoSettings({
         </div>
       </div>
 
-      {/* Baris 2: Preset & FPS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-200">
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -160,7 +158,6 @@ export default function VideoSettings({
         </div>
       </div>
 
-      {/* Baris 3: Checkbox */}
       <div className="pt-2 border-t border-gray-200 flex items-start sm:items-center space-x-2">
         <input
           type="checkbox"
