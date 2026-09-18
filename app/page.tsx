@@ -9,6 +9,7 @@ import VideoSettings from "@/components/VideoSettings";
 import VideoConvertSettings from "@/components/VideoConvertSettings";
 import SeoContent from "@/components/SeoContent";
 import { useFFmpeg } from "@/hooks/useFFmpeg";
+import { parseTimeToSeconds } from "@/utilities/formatter";
 
 export default function Home() {
   const {
@@ -26,10 +27,10 @@ export default function Home() {
     "audio",
   );
 
-  // Audio Options
+  // Audio Options (Menggunakan endTime menggantikan duration)
   const [format, setFormat] = useState<string>("mp3");
   const [startTime, setStartTime] = useState<string>("");
-  const [duration, setDuration] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
   const [bitrate, setBitrate] = useState<string>("192k");
 
   // Video Compression Options
@@ -53,8 +54,8 @@ export default function Home() {
     if (activeTab === "audio") {
       extractAudio(file, {
         format,
-        startTime: startTime ? parseFloat(startTime) : 0,
-        duration: duration ? parseFloat(duration) : 0,
+        startTime: parseTimeToSeconds(startTime),
+        endTime: endTime ? parseTimeToSeconds(endTime) : undefined,
         bitrate,
       });
     } else if (activeTab === "compress") {
@@ -75,7 +76,7 @@ export default function Home() {
 
   return (
     <main className="flex-1 w-full bg-gray-50 py-6 sm:py-12 px-3 sm:px-4 flex flex-col items-center justify-start">
-      {/* CARD TOOL UTAMA (Padding & Lebar Responsif) */}
+      {/* MAIN TOOL CARD */}
       <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-gray-100 mb-8 sm:mb-10">
         <div className="text-center mb-6">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
@@ -87,7 +88,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* TAB SWITCHER (Responsif ke bawah di layar kecil jika perlu, atau flex rapi) */}
+        {/* TAB SWITCHER */}
         <div className="flex flex-col sm:flex-row bg-gray-100 p-1 rounded-xl mb-6 text-xs font-medium gap-1">
           <button
             onClick={() => setActiveTab("audio")}
@@ -146,8 +147,8 @@ export default function Home() {
             setBitrate={setBitrate}
             startTime={startTime}
             setStartTime={setStartTime}
-            duration={duration}
-            setDuration={setDuration}
+            endTime={endTime}
+            setEndTime={setEndTime}
             isProcessing={isProcessing}
           />
         )}

@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 interface AudioOptions {
   format?: string;
   startTime?: number;
-  duration?: number;
+  endTime?: number;
   bitrate?: string;
 }
 
@@ -19,7 +19,7 @@ interface VideoOptions {
 }
 
 interface VideoConvertOptions {
-  format?: string; // "mp4", "mkv", "webm", "avi", "mov"
+  format?: string;
   videoCodec?: string;
   audioCodec?: string;
 }
@@ -86,7 +86,7 @@ export function useFFmpeg() {
           file,
           outputFormat: options.format || "mp3",
           startTime: options.startTime || 0,
-          duration: options.duration || 0,
+          endTime: options.endTime,
           bitrate: options.bitrate || "192k",
         },
       });

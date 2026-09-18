@@ -5,8 +5,8 @@ interface AudioSettingsProps {
   setBitrate: (val: string) => void;
   startTime: string;
   setStartTime: (val: string) => void;
-  duration: string;
-  setDuration: (val: string) => void;
+  endTime: string;
+  setEndTime: (val: string) => void;
   isProcessing: boolean;
 }
 
@@ -17,8 +17,8 @@ export default function AudioSettings({
   setBitrate,
   startTime,
   setStartTime,
-  duration,
-  setDuration,
+  endTime,
+  setEndTime,
   isProcessing,
 }: AudioSettingsProps) {
   return (
@@ -84,11 +84,11 @@ export default function AudioSettings({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-gray-200">
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">
-            Start Time (Detik)
+            Start Time (e.g. 0 or 1:30)
           </label>
           <input
-            type="number"
-            placeholder="Contoh: 0"
+            type="text"
+            placeholder="0 or 0:30"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             disabled={isProcessing}
@@ -97,13 +97,13 @@ export default function AudioSettings({
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">
-            Duration / Durasi (Detik)
+            End Time (e.g. 90 or 2:15)
           </label>
           <input
-            type="number"
-            placeholder="Kosongkan jika full"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
+            type="text"
+            placeholder="Leave empty for full"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
             disabled={isProcessing}
             className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none"
           />
