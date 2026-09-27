@@ -9,10 +9,6 @@ export async function handleImageProcess(
 ): Promise<Blob> {
   const { file, format, quality } = payload;
 
-  console.log("====================================");
-  console.log(format);
-  console.log("====================================");
-
   try {
     const imageBitmap = await createImageBitmap(file);
 

@@ -5,6 +5,7 @@ import { handleVideoCompress } from "./tasks/videoCompressTask";
 import { handleVideoConvert } from "./tasks/videoConvertTask";
 import { handleVideoTrim } from "./tasks/videoTrimTask";
 import { handleImageProcess } from "./tasks/imageTask";
+import { handleGifMake } from "./tasks/gifTask";
 
 const ffmpeg = new FFmpeg();
 
@@ -58,6 +59,8 @@ self.onmessage = async (e: MessageEvent) => {
       resultBlob = await handleVideoTrim(ffmpeg, payload);
     } else if (type === "PROCESS_IMAGE") {
       resultBlob = await handleImageProcess(payload);
+    } else if (type === "MAKE_GIF") {
+      resultBlob = await handleGifMake(ffmpeg, payload); // <-- Tambahkan ini
     } else {
       throw new Error(`Unknown task type: ${type}`);
     }

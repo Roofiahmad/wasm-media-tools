@@ -13,6 +13,7 @@ import { useFFmpeg } from "@/hooks/useFFmpeg";
 import { parseTimeToSeconds } from "@/utilities/formatter";
 import ImageSettings from "@/components/ImageSettings";
 import Image from "next/image";
+import GifSettings from "@/components/GifSettings";
 
 export default function Home() {
   const {
@@ -26,10 +27,11 @@ export default function Home() {
     convertVideo,
     trimVideo,
     processImage,
+    makeGif,
   } = useFFmpeg();
 
   const [activeTab, setActiveTab] = useState<
-    "audio" | "compress" | "convert" | "trim" | "image"
+    "audio" | "compress" | "convert" | "trim" | "image" | "gif"
   >("audio");
 
   // Audio Options
@@ -57,6 +59,12 @@ export default function Home() {
   // Image Format
   const [imageFormat, setImageFormat] = useState<string>("image/jpeg");
   const [quality, setQuality] = useState<number>(0.8);
+
+  // 3. GIF Maker
+  const [gifStart, setGifStart] = useState<string>("00:00");
+  const [gifDuration, setGifDuration] = useState<string>("5");
+  const [gifFps, setGifFps] = useState<string>("15");
+  const [gifScale, setGifScale] = useState<string>("320:-1");
 
   const [selectedFileName, setSelectedFileName] =
     useState<string>("media-output");
@@ -105,6 +113,13 @@ export default function Home() {
       processImage(file, {
         format: imageFormat,
         quality,
+      });
+    } else if (activeTab === "gif") {
+      makeGif(file, {
+        startTime: parseTimeToSeconds(gifStart),
+        duration: parseFloat(gifDuration) || 5,
+        fps: parseInt(gifFps) || 15,
+        scale: gifScale,
       });
     }
   };
@@ -180,6 +195,18 @@ export default function Home() {
             }`}
           >
             🖼️ Image Format
+          </button>
+
+          <button
+            onClick={() => setActiveTab("gif")}
+            disabled={isProcessing}
+            className={`py-2 px-1 rounded-lg transition-all text-center ${
+              activeTab === "gif"
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            🎞️ GIF Maker
           </button>
         </div>
 
@@ -259,6 +286,20 @@ export default function Home() {
           />
         )}
 
+        {activeTab === "gif" && (
+          <GifSettings
+            startTime={gifStart}
+            setStartTime={setGifStart}
+            duration={gifDuration}
+            setDuration={setGifDuration}
+            fps={gifFps}
+            setFps={setGifFps}
+            scale={gifScale}
+            setScale={setGifScale}
+            isProcessing={isProcessing}
+          />
+        )}
+
         {/* DROPZONE & PROGRESS */}
         <Dropzone
           onFileSelect={handleFileSelect}
@@ -275,7 +316,7 @@ export default function Home() {
                 fileName={`${selectedFileName}.${format}`}
               />
             ) : activeTab === "image" ? (
-              <div className="p-4 bg-slate-900 text-white rounded-2xl flex items-center justify-between">
+              <div className="p-4 bg-slate-900 text-white rounded-2xl flex items-center justify-between gap-4">
                 <div>
                   <p className="text-xs text-slate-400">Success</p>
                   <p className="text-sm font-medium">
@@ -283,13 +324,31 @@ export default function Home() {
                     {imageFormat.replace("image/", "")}
                   </p>
                 </div>
-                <div className="relative w-24 h-14 rounded-lg overflow-hidden bg-black">
+                <div className="relative w-24 h-16 rounded-lg overflow-hidden bg-black border border-slate-700 shrink-0">
                   <Image
                     src={resultUrl}
                     alt="Converted Result"
                     fill
                     unoptimized
                     className="object-cover"
+                  />
+                </div>
+              </div>
+            ) : activeTab === "gif" ? (
+              <div className="p-4 bg-slate-900 text-white rounded-2xl flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs text-slate-400">Success</p>
+                  <p className="text-sm font-medium">
+                    {selectedFileName}_animation.gif
+                  </p>
+                </div>
+                <div className="relative w-24 h-16 rounded-lg overflow-hidden bg-black border border-slate-700 shrink-0">
+                  <Image
+                    src={resultUrl}
+                    alt="GIF Result"
+                    fill
+                    unoptimized
+                    className="object-contain"
                   />
                 </div>
               </div>
@@ -325,7 +384,9 @@ export default function Home() {
                       ? `${selectedFileName}_output.${videoFormat}`
                       : activeTab === "trim"
                         ? `${selectedFileName}_trimmed.${trimFormat}`
-                        : `${selectedFileName}_converted.${imageFormat.replace("image/", "")}`
+                        : activeTab === "image"
+                          ? `${selectedFileName}_converted.${imageFormat.replace("image/", "")}`
+                          : `${selectedFileName}_animation.gif`
               }
               className="w-full flex items-center justify-center space-x-2 px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-xl font-medium transition-colors shadow-sm cursor-pointer text-sm"
             >

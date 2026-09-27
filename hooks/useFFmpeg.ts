@@ -35,6 +35,13 @@ interface ImageOptions {
   quality?: number;
 }
 
+interface GifOptions {
+  startTime?: number;
+  duration?: number;
+  fps?: number;
+  scale?: string;
+}
+
 export function useFFmpeg() {
   const workerRef = useRef<Worker | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -191,6 +198,28 @@ export function useFFmpeg() {
     [isReady],
   );
 
+  const makeGif = useCallback(
+    (file: File, options: GifOptions = {}) => {
+      if (!workerRef.current || !isReady) return;
+      setIsProcessing(true);
+      setProgress(0);
+      setResultUrl(null);
+      setError(null);
+
+      workerRef.current.postMessage({
+        type: "MAKE_GIF",
+        payload: {
+          file,
+          startTime: options.startTime || 0,
+          duration: options.duration || 5,
+          fps: options.fps || 15,
+          scale: options.scale || "320:-1",
+        },
+      });
+    },
+    [isReady],
+  );
+
   return {
     isReady,
     isProcessing,
@@ -202,5 +231,6 @@ export function useFFmpeg() {
     convertVideo,
     trimVideo,
     processImage,
+    makeGif,
   };
 }
