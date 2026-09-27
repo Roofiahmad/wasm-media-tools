@@ -5,7 +5,7 @@ interface VideoCompressPayload {
   file: File;
   resolution: string;
   videoBitrate: string;
-  outputFormat: string; // <-- Tambahan parameter format
+  outputFormat: string;
   preset: string;
   fps: string;
   audioCopy: boolean;
@@ -36,7 +36,6 @@ export async function handleVideoCompress(
     args.push("-vf", `scale=-2:${resolution}`);
   }
 
-  // Jika format webm, sesuaikan codec videonya ke libvpx-vp9 biar optimal
   if (ext === "webm") {
     args.push("-c:v", "libvpx-vp9", "-speed", "4");
   } else {

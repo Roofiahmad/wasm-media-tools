@@ -23,11 +23,10 @@ export default function AudioPlayer({ audioUrl, fileName }: AudioPlayerProps) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const bars = 48; // Jumlah batang waveform
+    const bars = 48;
     const barWidth = canvas.width / bars - 2;
 
     for (let i = 0; i < bars; i++) {
-      // Generate tinggi batang acak yang simetris/estetik (bisa diganti AnalyserNode jika mau real-time)
       const barHeight = Math.max(
         8,
         Math.sin(i * 0.3) * 25 + Math.random() * 20,
@@ -35,7 +34,7 @@ export default function AudioPlayer({ audioUrl, fileName }: AudioPlayerProps) {
       const x = i * (barWidth + 2);
       const y = (canvas.height - barHeight) / 2;
 
-      ctx.fillStyle = "#3b82f6"; // Warna biru Tailwind (blue-500)
+      ctx.fillStyle = "#3b82f6";
       ctx.roundRect
         ? ctx.roundRect(x, y, barWidth, barHeight, 4)
         : ctx.fillRect(x, y, barWidth, barHeight);

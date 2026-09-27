@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
-  // Inject headers untuk Cross-Origin Isolation (Wajib untuk FFmpeg Multi-threading)
   async headers() {
     return [
       {
@@ -19,19 +21,17 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  
-  // Tambahkan ini untuk membungkam error Turbopack di mode development
+
   turbopack: {},
 
-  // Biarkan webpack config ini untuk production build (npm run build)
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      "sharp$": false,
+      sharp$: false,
       "onnxruntime-node$": false,
     };
     return config;
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

@@ -7,10 +7,10 @@ export const parseTimeToSeconds = (timeStr: string): number => {
     if (parts.some(isNaN)) return 0;
 
     if (parts.length === 3) {
-      // Jam:Menit:Detik
+      // HH:MM:SS
       return parts[0] * 3600 + parts[1] * 60 + parts[2];
     } else if (parts.length === 2) {
-      // Menit:Detik
+      // MM:SS
       return parts[0] * 60 + parts[1];
     }
   }

@@ -45,7 +45,6 @@ export async function handleAudioConvert(
   };
   const mimeType = mimeTypes[outputFormat] || `audio/${outputFormat}`;
 
-  // Konversi Uint8Array / data ke ArrayBuffer agar aman diterima konstruktor Blob TypeScript
   const blob = new Blob([(data as Uint8Array).buffer as BlobPart], {
     type: mimeType,
   });

@@ -24,7 +24,6 @@ export default function VideoTrimmer({
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Handle Upload Video
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -34,7 +33,6 @@ export default function VideoTrimmer({
     }
   };
 
-  // Proses Trimming dengan FFmpeg WASM
   const handleTrim = async () => {
     if (!videoFile || !ffmpeg) return;
 
@@ -45,7 +43,6 @@ export default function VideoTrimmer({
       const inputFileName = "input.mp4";
       const outputFileName = "output_trimmed.mp4";
 
-      // Tulis file ke memori virtual FFmpeg
       const fileData = await videoFile.arrayBuffer();
       await ffmpeg.writeFile(inputFileName, new Uint8Array(fileData));
 
@@ -75,7 +72,6 @@ export default function VideoTrimmer({
 
       setProgressMessage("Generating output file...");
 
-      // Ambil hasil dari memori virtual
       const data = await ffmpeg.readFile(outputFileName);
       const blob = new Blob([data as unknown as BlobPart], {
         type: "video/mp4",

@@ -1,0 +1,10 @@
+{
+  "SeoContent": {
+    "title": "Why Use WASM Media Tool?",
+    "desc": "Most online converters require you to upload your personal videos or audio files to a third-party cloud server. WASM Media Tool operates entirely on your device using WebAssembly technology. Your files never leave your browser, ensuring absolute privacy and zero upload waiting times.",
+    "q1": "🔒 Is my data safe?",
+    "a1": "Yes, 100% safe. All processing happens locally inside your browser memory sandbox. We do not store, track, or look at your media files.",
+    "q2": "⚡ How does it work?",
+    "a2": "We run a compiled version of FFmpeg directly inside a web worker using WebAssembly and multi-threading, bringing native desktop-grade media conversion straight to your browser."
+  }
+}

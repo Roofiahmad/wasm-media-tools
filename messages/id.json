@@ -1,0 +1,10 @@
+{
+  "SeoContent": {
+    "title": "Kenapa Harus Pakai WASM Media Tool?",
+    "desc": "Kebanyakan converter online mengharuskan Anda mengunggah video atau audio pribadi ke server cloud pihak ketiga. WASM Media Tool berjalan 100% langsung di perangkat Anda menggunakan teknologi WebAssembly. File Anda tidak pernah keluar dari browser, menjamin privasi total tanpa waktu tunggu upload.",
+    "q1": "🔒 Apakah data saya aman?",
+    "a1": "100% aman. Semua proses pemotongan dan konversi video berjalan lokal di dalam memori browser Anda. Kami tidak menyimpan, melacak, ataupun melihat file media Anda sama sekali.",
+    "q2": "⚡ Bagaimana cara kerjanya?",
+    "a2": "Kami menjalankan versi compiler FFmpeg langsung di dalam web worker menggunakan WebAssembly, menghadirkan performa setara aplikasi desktop langsung di browser Anda secara gratis."
+  }
+}
