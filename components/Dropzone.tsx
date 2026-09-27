@@ -65,7 +65,7 @@ export default function Dropzone({ onFileSelect, disabled }: DropzoneProps) {
           or drag and drop
         </p>
         <p className="text-xs text-gray-500">
-          MP4, MOV, WEBM (Client-side process)
+          Video, Audio, or Image files (Client-side WASM process)
         </p>
         <input
           type="file"

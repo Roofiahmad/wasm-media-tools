@@ -133,8 +133,8 @@ export default function Home() {
             WASM Media Tool
           </h1>
           <p className="text-gray-500 mt-2 text-xs sm:text-sm">
-            Extract audio, compress video, trim clips, and convert formats 100%
-            locally in your browser.
+            Extract audio, compress video, convert formats, trim clips, process
+            images, and create GIFs 100% locally in your browser.
           </p>
         </div>
 
