@@ -1,46 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-
-interface AudioOptions {
-  format?: string;
-  startTime?: number;
-  endTime?: number;
-  bitrate?: string;
-}
-
-interface VideoOptions {
-  resolution?: string;
-  videoBitrate?: string;
-  outputFormat?: string;
-  preset?: string;
-  fps?: string;
-  audioCopy?: boolean;
-}
-
-interface VideoConvertOptions {
-  format?: string;
-  videoCodec?: string;
-  audioCodec?: string;
-}
-
-interface TrimOptions {
-  startTime?: number;
-  endTime?: number;
-  outputFormat?: string;
-}
-
-interface ImageOptions {
-  format?: string;
-  quality?: number;
-}
-
-interface GifOptions {
-  startTime?: number;
-  duration?: number;
-  fps?: number;
-  scale?: string;
-}
+import {
+  AudioOptions,
+  VideoOptions,
+  GifOptions,
+  TrimOptions,
+  ImageOptions,
+  VideoConvertOptions,
+} from "./types";
 
 export function useFFmpeg() {
   const workerRef = useRef<Worker | null>(null);
