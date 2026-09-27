@@ -3,6 +3,7 @@ import { toBlobURL } from "@ffmpeg/util";
 import { handleAudioConvert } from "./tasks/audioTask";
 import { handleVideoCompress } from "./tasks/videoCompressTask";
 import { handleVideoConvert } from "./tasks/videoConvertTask";
+import { handleVideoTrim } from "./tasks/videoTrimTask";
 
 const ffmpeg = new FFmpeg();
 
@@ -52,6 +53,8 @@ self.onmessage = async (e: MessageEvent) => {
       resultBlob = await handleVideoCompress(ffmpeg, payload);
     } else if (type === "CONVERT_VIDEO") {
       resultBlob = await handleVideoConvert(ffmpeg, payload);
+    } else if (type === "TRIM_VIDEO") {
+      resultBlob = await handleVideoTrim(ffmpeg, payload);
     } else {
       throw new Error(`Unknown task type: ${type}`);
     }

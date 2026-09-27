@@ -24,6 +24,12 @@ interface VideoConvertOptions {
   audioCodec?: string;
 }
 
+interface TrimOptions {
+  startTime?: number;
+  endTime?: number;
+  outputFormat?: string;
+}
+
 export function useFFmpeg() {
   const workerRef = useRef<Worker | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -139,6 +145,27 @@ export function useFFmpeg() {
     [isReady],
   );
 
+  const trimVideo = useCallback(
+    (file: File, options: TrimOptions = {}) => {
+      if (!workerRef.current || !isReady) return;
+      setIsProcessing(true);
+      setProgress(0);
+      setResultUrl(null);
+      setError(null);
+
+      workerRef.current.postMessage({
+        type: "TRIM_VIDEO",
+        payload: {
+          file,
+          startTime: options.startTime || 0,
+          endTime: options.endTime,
+          outputFormat: options.outputFormat || "mp4",
+        },
+      });
+    },
+    [isReady],
+  );
+
   return {
     isReady,
     isProcessing,
@@ -148,5 +175,6 @@ export function useFFmpeg() {
     extractAudio,
     compressVideo,
     convertVideo,
+    trimVideo,
   };
 }

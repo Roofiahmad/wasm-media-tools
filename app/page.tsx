@@ -7,6 +7,7 @@ import AudioPlayer from "@/components/AudioPlayer";
 import AudioSettings from "@/components/AudioSettings";
 import VideoSettings from "@/components/VideoSettings";
 import VideoConvertSettings from "@/components/VideoConvertSettings";
+import VideoTrimSettings from "@/components/VideoTrimSettings";
 import SeoContent from "@/components/SeoContent";
 import { useFFmpeg } from "@/hooks/useFFmpeg";
 import { parseTimeToSeconds } from "@/utilities/formatter";
@@ -21,13 +22,14 @@ export default function Home() {
     extractAudio,
     compressVideo,
     convertVideo,
+    trimVideo,
   } = useFFmpeg();
 
-  const [activeTab, setActiveTab] = useState<"audio" | "compress" | "convert">(
-    "audio",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "audio" | "compress" | "convert" | "trim"
+  >("audio");
 
-  // Audio Options (Menggunakan endTime menggantikan duration)
+  // Audio Options
   const [format, setFormat] = useState<string>("mp3");
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
@@ -43,6 +45,12 @@ export default function Home() {
 
   // Video Converter Options
   const [videoFormat, setVideoFormat] = useState<string>("mp4");
+
+  // Video Trimmer Options (Dengan format waktu fleksibel)
+  const [trimStart, setTrimStart] = useState<string>("00:00");
+  const [trimEnd, setTrimEnd] = useState<string>("00:10");
+  const [trimFormat, setTrimFormat] = useState<string>("mp4");
+
   const [selectedFileName, setSelectedFileName] =
     useState<string>("media-output");
 
@@ -67,9 +75,23 @@ export default function Home() {
         fps,
         audioCopy,
       });
-    } else {
+    } else if (activeTab === "convert") {
       convertVideo(file, {
         format: videoFormat,
+      });
+    } else if (activeTab === "trim") {
+      const startSec = parseTimeToSeconds(trimStart);
+      const endSec = parseTimeToSeconds(trimEnd);
+
+      if (endSec <= startSec) {
+        alert("End time must be greater than start time!");
+        return;
+      }
+
+      trimVideo(file, {
+        startTime: startSec,
+        endTime: endSec,
+        outputFormat: trimFormat,
       });
     }
   };
@@ -83,17 +105,17 @@ export default function Home() {
             WASM Media Tool
           </h1>
           <p className="text-gray-500 mt-2 text-xs sm:text-sm">
-            Extract audio, compress video, and convert formats 100% locally in
-            your browser.
+            Extract audio, compress video, trim clips, and convert formats 100%
+            locally in your browser.
           </p>
         </div>
 
         {/* TAB SWITCHER */}
-        <div className="flex flex-col sm:flex-row bg-gray-100 p-1 rounded-xl mb-6 text-xs font-medium gap-1">
+        <div className="grid grid-cols-2 sm:grid-cols-4 bg-gray-100 p-1 rounded-xl mb-6 text-xs font-medium gap-1">
           <button
             onClick={() => setActiveTab("audio")}
             disabled={isProcessing}
-            className={`flex-1 py-2.5 rounded-lg transition-all ${
+            className={`py-2.5 rounded-lg transition-all text-center ${
               activeTab === "audio"
                 ? "bg-white text-blue-600 shadow-sm"
                 : "text-gray-500 hover:text-gray-900"
@@ -104,7 +126,7 @@ export default function Home() {
           <button
             onClick={() => setActiveTab("compress")}
             disabled={isProcessing}
-            className={`flex-1 py-2.5 rounded-lg transition-all ${
+            className={`py-2.5 rounded-lg transition-all text-center ${
               activeTab === "compress"
                 ? "bg-white text-blue-600 shadow-sm"
                 : "text-gray-500 hover:text-gray-900"
@@ -115,13 +137,24 @@ export default function Home() {
           <button
             onClick={() => setActiveTab("convert")}
             disabled={isProcessing}
-            className={`flex-1 py-2.5 rounded-lg transition-all ${
+            className={`py-2.5 rounded-lg transition-all text-center ${
               activeTab === "convert"
                 ? "bg-white text-blue-600 shadow-sm"
                 : "text-gray-500 hover:text-gray-900"
             }`}
           >
-            🔄 Video Convert
+            🔄 Convert
+          </button>
+          <button
+            onClick={() => setActiveTab("trim")}
+            disabled={isProcessing}
+            className={`py-2.5 rounded-lg transition-all text-center ${
+              activeTab === "trim"
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            ✂️ Trim Video
           </button>
         </div>
 
@@ -179,6 +212,18 @@ export default function Home() {
           />
         )}
 
+        {activeTab === "trim" && (
+          <VideoTrimSettings
+            trimStart={trimStart}
+            setTrimStart={setTrimStart}
+            trimEnd={trimEnd}
+            setTrimEnd={setTrimEnd}
+            trimFormat={trimFormat}
+            setTrimFormat={setTrimFormat}
+            isProcessing={isProcessing}
+          />
+        )}
+
         {/* DROPZONE & PROGRESS */}
         <Dropzone
           onFileSelect={handleFileSelect}
@@ -200,7 +245,11 @@ export default function Home() {
                   <p className="text-xs text-slate-400">Success</p>
                   <p className="text-sm font-medium">
                     {selectedFileName}.
-                    {activeTab === "compress" ? compressionFormat : videoFormat}
+                    {activeTab === "compress"
+                      ? compressionFormat
+                      : activeTab === "convert"
+                        ? videoFormat
+                        : trimFormat}
                   </p>
                 </div>
                 <video
@@ -218,7 +267,9 @@ export default function Home() {
                   ? `${selectedFileName}.${format}`
                   : activeTab === "compress"
                     ? `${selectedFileName}_compressed.${compressionFormat}`
-                    : `${selectedFileName}_output.${videoFormat}`
+                    : activeTab === "convert"
+                      ? `${selectedFileName}_output.${videoFormat}`
+                      : `${selectedFileName}_trimmed.${trimFormat}`
               }
               className="w-full flex items-center justify-center space-x-2 px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-xl font-medium transition-colors shadow-sm cursor-pointer text-sm"
             >

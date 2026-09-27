@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 1.0,
     },
-    // Kalau nanti ada halaman lain (misal: /about, /privacy), tinggal tambahkan di sini:
+
     {
       url: `${baseUrl}/privacy`,
       lastModified: new Date(),
