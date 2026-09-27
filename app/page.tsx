@@ -11,6 +11,8 @@ import VideoTrimSettings from "@/components/VideoTrimSettings";
 import SeoContent from "@/components/SeoContent";
 import { useFFmpeg } from "@/hooks/useFFmpeg";
 import { parseTimeToSeconds } from "@/utilities/formatter";
+import ImageSettings from "@/components/ImageSettings";
+import Image from "next/image";
 
 export default function Home() {
   const {
@@ -23,10 +25,11 @@ export default function Home() {
     compressVideo,
     convertVideo,
     trimVideo,
+    processImage,
   } = useFFmpeg();
 
   const [activeTab, setActiveTab] = useState<
-    "audio" | "compress" | "convert" | "trim"
+    "audio" | "compress" | "convert" | "trim" | "image"
   >("audio");
 
   // Audio Options
@@ -50,6 +53,10 @@ export default function Home() {
   const [trimStart, setTrimStart] = useState<string>("00:00");
   const [trimEnd, setTrimEnd] = useState<string>("00:10");
   const [trimFormat, setTrimFormat] = useState<string>("mp4");
+
+  // Image Format
+  const [imageFormat, setImageFormat] = useState<string>("image/jpeg");
+  const [quality, setQuality] = useState<number>(0.8);
 
   const [selectedFileName, setSelectedFileName] =
     useState<string>("media-output");
@@ -92,6 +99,12 @@ export default function Home() {
         startTime: startSec,
         endTime: endSec,
         outputFormat: trimFormat,
+      });
+    } else if (activeTab === "image") {
+      console.log(imageFormat, "imageFormat");
+      processImage(file, {
+        format: imageFormat,
+        quality,
       });
     }
   };
@@ -155,6 +168,18 @@ export default function Home() {
             }`}
           >
             ✂️ Trim Video
+          </button>
+
+          <button
+            onClick={() => setActiveTab("image")}
+            disabled={isProcessing}
+            className={`flex-1 py-2.5 rounded-lg transition-all text-center ${
+              activeTab === "image"
+                ? "bg-white text-blue-600 shadow-sm font-medium"
+                : "text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            🖼️ Image Format
           </button>
         </div>
 
@@ -224,6 +249,16 @@ export default function Home() {
           />
         )}
 
+        {activeTab === "image" && (
+          <ImageSettings
+            imageFormat={imageFormat}
+            setImageFormat={setImageFormat}
+            quality={quality}
+            setQuality={setQuality}
+            isProcessing={isProcessing}
+          />
+        )}
+
         {/* DROPZONE & PROGRESS */}
         <Dropzone
           onFileSelect={handleFileSelect}
@@ -239,6 +274,25 @@ export default function Home() {
                 audioUrl={resultUrl}
                 fileName={`${selectedFileName}.${format}`}
               />
+            ) : activeTab === "image" ? (
+              <div className="p-4 bg-slate-900 text-white rounded-2xl flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-slate-400">Success</p>
+                  <p className="text-sm font-medium">
+                    {selectedFileName}_converted.
+                    {imageFormat.replace("image/", "")}
+                  </p>
+                </div>
+                <div className="relative w-24 h-14 rounded-lg overflow-hidden bg-black">
+                  <Image
+                    src={resultUrl}
+                    alt="Converted Result"
+                    fill
+                    unoptimized
+                    className="object-cover"
+                  />
+                </div>
+              </div>
             ) : (
               <div className="p-4 bg-slate-900 text-white rounded-2xl flex items-center justify-between">
                 <div>
@@ -269,7 +323,9 @@ export default function Home() {
                     ? `${selectedFileName}_compressed.${compressionFormat}`
                     : activeTab === "convert"
                       ? `${selectedFileName}_output.${videoFormat}`
-                      : `${selectedFileName}_trimmed.${trimFormat}`
+                      : activeTab === "trim"
+                        ? `${selectedFileName}_trimmed.${trimFormat}`
+                        : `${selectedFileName}_converted.${imageFormat.replace("image/", "")}`
               }
               className="w-full flex items-center justify-center space-x-2 px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-xl font-medium transition-colors shadow-sm cursor-pointer text-sm"
             >

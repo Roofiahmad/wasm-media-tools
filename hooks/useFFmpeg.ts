@@ -30,6 +30,11 @@ interface TrimOptions {
   outputFormat?: string;
 }
 
+interface ImageOptions {
+  format?: string;
+  quality?: number;
+}
+
 export function useFFmpeg() {
   const workerRef = useRef<Worker | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -166,6 +171,26 @@ export function useFFmpeg() {
     [isReady],
   );
 
+  const processImage = useCallback(
+    (file: File, options: ImageOptions = {}) => {
+      if (!workerRef.current || !isReady) return;
+      setIsProcessing(true);
+      setProgress(0);
+      setResultUrl(null);
+      setError(null);
+
+      workerRef.current.postMessage({
+        type: "PROCESS_IMAGE",
+        payload: {
+          file,
+          format: options.format || "image/jpeg",
+          quality: options.quality ?? 0.8,
+        },
+      });
+    },
+    [isReady],
+  );
+
   return {
     isReady,
     isProcessing,
@@ -176,5 +201,6 @@ export function useFFmpeg() {
     compressVideo,
     convertVideo,
     trimVideo,
+    processImage,
   };
 }

@@ -69,7 +69,7 @@ export default function Dropzone({ onFileSelect, disabled }: DropzoneProps) {
         </p>
         <input
           type="file"
-          accept="video/*,audio/*"
+          accept="video/*,audio/*,image/*"
           className="hidden"
           disabled={disabled}
           onChange={(e) => {
